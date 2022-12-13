@@ -1,0 +1,79 @@
+buildscript {
+	repositories {
+		maven {
+			url "https://plugins.gradle.org/m2/"
+		}
+	}
+	dependencies {
+		classpath "com.github.shalousun:smart-doc-gradle-plugin:2.2.3"
+	}
+}
+
+plugins {
+	id 'org.springframework.boot' version '2.7.0'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+	id "com.github.shalousun.smart-doc" version "2.2.3"
+}
+
+apply plugin: "com.github.shalousun.smart-doc"
+
+
+group = 'com.jrong98.basic'
+version = '0.0.1'
+sourceCompatibility = '1.8'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation (group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.7.0') {
+		exclude(group: 'org.springframework.boot', module: 'spring-boot-starter-tomcat')
+	}
+	implementation ('org.springframework.boot:spring-boot-starter-undertow:2.7.0') {
+		exclude(group: 'io.undertow', module: 'undertow-websockets-jsr')
+	}
+	implementation ('org.springframework.boot:spring-boot-starter-validation:2.7.0') {
+		exclude(group: 'org.apache.tomcat.embed', module: 'tomcat-embed-el')
+	}
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    implementation 'junit:junit:4.13.1'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis:2.7.0'
+	implementation 'org.apache.commons:commons-lang3:3.12.0'
+	implementation 'commons-codec:commons-codec:1.15'
+	implementation 'org.apache.commons:commons-pool2'
+
+	implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.2'
+	implementation 'mysql:mysql-connector-java:8.0.29'
+
+	compileOnly 'org.projectlombok:lombok:1.18.24'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+
+smartdoc {
+	configFile = file("src/main/resources/smart-doc-config.json")
+	// exclude artifact
+	exclude 'org.springframework.boot:spring-boot-starter-tomcat'
+	exclude 'org.springframework.boot.*'
+	// You can use the include configuration to let the plugin automatically load the specified source.
+	// include example
+}
+
+
+apply plugin: 'java'
+apply plugin: "com.github.shalousun.smart-doc"
+apply plugin: 'io.spring.dependency-management'
+
+
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

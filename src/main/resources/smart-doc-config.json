@@ -1,0 +1,8 @@
+{
+    "outPath" : "api-doc",
+    "allInOne": true,
+    "coverOld": true,
+    "projectName": "jrong98-basic",
+    "framework": "spring",
+    "showAuthor": true
+}

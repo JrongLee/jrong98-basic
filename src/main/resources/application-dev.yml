@@ -1,0 +1,105 @@
+server:
+  port: 8000
+  server-header: nginx
+  max-http-header-size: 4KB
+  shutdown: GRACEFUL
+  servlet:
+    application-display-name: unicorn
+    content-path: /
+    seesion:
+      persistent: true
+      tiemout: 10m
+      storeDir: data/session
+      trackingModes:
+        - COOKIE
+
+  undertow:
+    threads:
+      io: 2
+      worker: 4
+    direct-buffers: true
+    max-http-post-size: 4MB
+    max-parameters: 32
+    max-cookies: 32
+    max-headers: 64
+    no-request-timeout: 1M
+    buffer-size: 1024
+
+    accesslog:
+      dir: "logs/jetty"
+      enabled: true
+      pattern: common
+      prefix: jetty_access_log
+      suffix: ".log"
+
+logging:
+  level:
+    com.jrong98.basic.dao: debug
+  pattern:
+    console: "%date{MM-dd HH:mm:ss} [%highlight(%-05level)]-[%thread]-[%logger{15}#%method:%line] %magenta(->) %message %n"
+    dateformat: MM-dd HH:mm:ss
+
+spring:
+
+  main:
+    lazy-initialization: true
+
+  pid:
+    fail-on-write-error: true
+    file: .pid
+
+  datasource:
+    name: master-datasource
+    url: jdbc:mysql://mysqlhost:3306/jrong98-basic?useUnicode=true&characterEncoding=UTF-8&useSSL=false&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT%2B8
+    username: "your name"
+    password: "your password"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.zaxxer.hikari.HikariDataSource
+
+    hikari:
+      allow-pool-suspension: false
+      auto-commit: true
+      connection-test-query: "SELECT 1"
+      connection-timeout: 3000
+      idle-timeout: 32000
+      initialization-fail-timeout: 8000
+      leak-detection-threshold: 40000
+      max-lifetime: 60000
+      maximum-pool-size: 4
+      minimum-idle: 1
+      pool-name: hikari-pool
+      transaction-isolation: TRANSACTION_REPEATABLE_READ
+      read-only: false
+  cache:
+    type: REDIS
+  redis:
+    host: redishost
+    port: 6379
+    password: "your password"
+    database: 0
+    connect-timeout: 3s
+    timeout: 3s
+    client-name: app-client
+    client-type: lettuce
+    lettuce:
+      pool:
+        max-active: 4
+        max-idle: 2
+        min-idle: 1
+        max-wait: 8s
+        time-between-eviction-runs: 1m
+        enabled: true
+        shutdown-timeout: 8s
+
+mybatis-plus:
+  config-location:
+    - "classpath*:/mapper/**/*.xml"
+  type-aliases-package: com.jrong98.basic.domain
+  global-config:
+    banner: false
+    db-config:
+      id-type: ASSIGN_ID
+  configuration-properties:
+    "@page": "com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor"
+    "page:limit": "100"
+

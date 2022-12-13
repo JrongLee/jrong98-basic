@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jrong98.basic.dao.UserMapper">
+
+    <resultMap id="TenantResultMap" type="com.jrong98.basic.common.entity.TenantEntity">
+        <result column="id" property="id" javaType="java.lang.Long" jdbcType="BIGINT" />
+        <result column="tenant_id" property="tenantId" javaType="java.lang.String" jdbcType="VARCHAR" />
+        <result column="created_at" property="createdAt" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+        <result column="created_by" property="createdBy" javaType="java.lang.String" jdbcType="VARCHAR" />
+        <result column="updated_at" property="updatedAt" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+        <result column="updated_by" property="updatedBy" javaType="java.lang.String" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <resultMap id="BaseResultMap" type="com.jrong98.basic.domain.User" extends="TenantResultMap">
+        <result column="email" property="email"/>
+        <result column="nickname" property="nickname"/>
+        <result column="status" property="status"/>
+        <result column="password" property="password"/>
+        <result column="avatar" property="avatar"/>
+        <result column="_roles" property="roles" javaType="java.lang.Integer" jdbcType="SMALLINT"/>
+        <result column="_last_sign_in_at" property="lastSignInAt"/>
+        <result column="_last_sign_in_ip" property="lastSignInIp" javaType="java.lang.String" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <resultMap id="UserDTOResultMap" type="com.jrong98.basic.domain.dto.UserDTO" extends="BaseResultMap">
+    </resultMap>
+    
+    <update id="updateLastSignInInfo">
+        UPDATE `t_u_user` SET
+            `_last_sign_in_at` = NOW()
+            , `_last_sign_in_ip` = INET_ATON(#{lastSignInIp, jdbcType=VARCHAR})
+        WHERE
+            `id` = #{userId, jdbcType=BIGINT}
+    </update>
+
+    <select id="selectPageDTO" resultMap="UserDTOResultMap">
+        SELECT a.`id`, a.`tenant_id`, a.`created_at`, a.`created_by`, a.`updated_at`
+            , a.`updated_by`, a.`email`, a.`nickname`, a.`status`, a.`password`, a.`_roles`
+            , a.`avatar`, a.`_last_sign_in_at`, INET_NTOA(a.`_last_sign_in_ip`) AS _last_sign_in_ip
+        FROM `t_u_user` a
+        <where>
+            <if test="ps.role != null">
+                AND (a.`_roles` &amp; #{ps.role, jdbcType=INTEGER}) &gt; 0
+            </if>
+        </where>
+    </select>
+
+</mapper>

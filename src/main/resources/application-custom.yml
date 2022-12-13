@@ -1,0 +1,3 @@
+unicorn:
+  common-thread-pool:
+    parallelism: 2
